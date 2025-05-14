@@ -18,6 +18,7 @@ library(httr)
 library(jsonlite)
 library(rvest)
 library(rredlist)
+library(lwgeom)
 
 #----------------------------------------------------------#
 # Set up -----
@@ -71,9 +72,17 @@ hkh_ranges <- merged_mammals|>
     by = c("sciname" = "sci_name")
   )
 
+# validate shapes 
+hkh_ranges <- validate_shapes_individually(hkh_ranges)
 
-Macaca_leonina <- range_polygon_terr_mammals|>
-  filter(sci_name=="Macaca leonina")
 
-x11()
-plot(Macaca_leonina$geometry)
+# some species have more than one range polygon.. union 
+hkh_ranges_sum <- hkh_ranges %>%
+  group_by(sciname) %>%
+  summarise(
+    SHAPE_Area = sum(SHAPE_Area, na.rm = TRUE),
+    geometry = st_union(st_combine(geometry))
+  ) %>%
+  ungroup()
+
+
