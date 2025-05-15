@@ -66,9 +66,13 @@ names(hkh_mammals_wide) <- str_replace_all(names(hkh_mammals_wide), "^", functio
 })
 
 
+hkh_mammals_final <- hkh_mammals_wide|>
+  select(sciname,order,family,habitat,min_elevation_Himalaya,max_elevation_Himalaya,`min_elevation_Tibetan Plateau`,`max_elevation_Tibetan Plateau`,`min_elevation_Balochistan Ranges`,`max_elevation_Balochistan Ranges`,`min_elevation_Hindu Kush`,`max_elevation_Hindu Kush`,min_elevation_Karakoram,max_elevation_Karakoram,mean_treeline_Himalaya,`mean_treeline_Tibetan Plateau`,`mean_treeline_Balochistan Ranges`,`mean_treeline_Hindu Kush`,mean_treeline_Karakoram)
+
+
 # save the data 
 library(writexl)
-write_xlsx(hkh_mammals_wide,paste(data_storage_path,"hkh_mammals_LS.xlsx"))
+write_xlsx(hkh_mammals_final,paste(data_storage_path,"hkh_mammals_LS.xlsx"))
 
 
 
