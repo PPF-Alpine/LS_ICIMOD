@@ -34,14 +34,22 @@ spp <- df %>%
   # Separate into genus and species by space
   separate(sciname, into = c("genus", "species"), sep = " ", remove = FALSE)
 
+
+#sp_assessment_list <- rl_species_latest(genus = "Ovis", species = "ammon",key=iucn_key)
+
 #----------------------------------------------------------#
 #   get a dataframe with info of interest for all species 
 #----------------------------------------------------------#
 
+spp <- spp|>
+  select(genus,species)
+
 # Apply across all species
-assessment_threats_complete <- pmap_dfr(spp[, c("genus", "species")], get_and_clean_iucn)
-
-sp_assessment <- rl_species_latest(genus = "Ovis", species = "ammon",key=iucn_key)
+assessment_threats_complete <- pmap_dfr(spp[, c("genus", "species")], get_and_clean_iucn_full)
 
 
-write.csv(assessment_threats_complete,paste0(data_storage_path,"RL_assessments/global_assessment_HKH_mammals.csv"))
+#----------------------------------------------------------#
+#   save
+#----------------------------------------------------------#
+
+write.csv(assessment_threats_complete,paste0(data_storage_path,"RL_assessments/global_assessment_HKH_mammals_full.csv"))
