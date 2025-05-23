@@ -3,7 +3,7 @@
 source(here::here("R/00_Config_file.R"))
 
 #----------------------------------------------------------#
-# join red list assesments -----
+# set up-----
 #----------------------------------------------------------#
 
 library(tidyverse)
@@ -14,7 +14,7 @@ RL_national <- read.csv(paste0(data_storage_path,"RL_assessments/national_assess
   janitor::clean_names()
 
 #----------------------------------------------------------#
-# join red list assesments -----
+# reshape data  -----
 #----------------------------------------------------------#
 
 RL_national <- RL_national|>
@@ -22,7 +22,7 @@ RL_national <- RL_national|>
     genus = word(species_or_taxon, 1),
     species = word(species_or_taxon, 2),
     sciname = paste(genus, species),
-    status_code = str_extract(status, "[A-Z]{2}(?=[^A-Za-z]*$)"))|>
+    status_code = str_extract(status, "[A-Z]{2}(?=[^A-Za-z]*$)"))|> # clean characters
   select(sciname,
          genus,species,
          species_or_taxon,
@@ -34,12 +34,12 @@ RL_national <- RL_national|>
          criteria_system,
          status,status_code,publication_citation)|>
   mutate(
-    status_summary = case_when(
+    status_summary = case_when( # add a summary column for IUCN status
       status_code %in% c("CR", "EN", "VU", "NT", "LE", "RE") ~ "threatened",
       status_code == "NE" ~ "not evaluated",
       status_code == "LC" ~ "not threatened",
       status_code == "DD" ~ "data deficient",
-      TRUE ~ "NA"  # Catch-all for unexpected codes
+      TRUE ~ "NA"  
     )
   )
   
@@ -83,23 +83,6 @@ RL_national_join <- RL_national|>
 RL_national_reshape <- RL_national_join|>
   select(kingdom,
          phylum,class,order,family,genus,species,sciname,species_or_taxon,common_names,year_assessed,countries_iso,locality,publication,criteria_system,status,status_code,status_summary,publication_citation)
-
-#----------------------------------------------------------#
-# filter for HKH countries -
-#----------------------------------------------------------#
-
-HKH_countries <- c("Nepal", 
-                   "Afghanistan", 
-                   "Bhutan", 
-                   "Pakistan", 
-                    "Myanmar", 
-                   "India", 
-                   "Bangladesh", 
-                   "China")
-
-RL_national_filter <- RL_national |>
-  filter(str_detect(countries_iso, 
-                    str_c(HKH_countries, collapse = "|")))
 
 
 #----------------------------------------------------------#
