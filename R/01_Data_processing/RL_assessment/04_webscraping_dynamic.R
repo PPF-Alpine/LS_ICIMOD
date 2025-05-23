@@ -1,14 +1,13 @@
 
 
 # Load configuration file
-source(here::here("R/00_Config_file.R"))
+source(here::here("R/00_Config_file.R"))# in this code only needed for datastorage path to save the final file
 
 # install.packages("rvest")
 library(rvest)
 library(httr2)
 library(tidyverse)
 library(glue)
-
 
 #----------------------------------------------------------#
 # Webscrape table from nationalredlist.org ---
