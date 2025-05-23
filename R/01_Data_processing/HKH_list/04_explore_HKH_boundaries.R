@@ -1,4 +1,5 @@
 library(leaflet)
+library(htmlwidgets)
 
 hkh_gmba <- sf::st_read(paste(data_storage_path,"HKH_Boundary/HKH_GMBA_clip.shp", sep = "/"))
 
@@ -16,7 +17,7 @@ hkh_boundaries <- sf::st_read(paste(data_storage_path,"HKH_Boundary/HKH_Boundary
 
 pal <- colorFactor(palette = "Set2", domain = hkh_gmba$MapName)
 
-library(htmlwidgets)
+# leaflet map to check out HKH boundary
 
 leaflet() %>%
   addProviderTiles(providers$Esri.WorldTopoMap, group = "Topo Map") %>%

@@ -60,10 +60,11 @@ HKH_mammals_restr <- HKH_mammals %>%
 #----------------------------------------------------------#
 
 # Extract the vector of scientific names
-scinames <- HKH_mammals_restr|>
-  pull(sciname)
+#scinames <- HKH_mammals_restr|>
+ # pull(sciname)
 
 # fetch gbif taxonomy
-taxonomy_df <- map_dfr(scinames, get_gbif_taxonomy)
+#taxonomy_df <- map_dfr(scinames, get_gbif_taxonomy)
 
+write.csv(HKH_mammals_restr,paste0(data_storage_path,"HKH_list/HKH_mammals_LS_23052025.csv"))
 

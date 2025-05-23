@@ -12,6 +12,8 @@ library(taxize)
 
 RL_national_complete <- read.csv(paste0(data_storage_path,"RL_assessments/national_IUCN_RL_assessments_23052025.csv"))
 
+HKH_list <- read.csv(paste0(data_storage_path,"HKH_list/HKH_mammals_LS_23052025.csv"))|>
+  select(-X)
 
 #----------------------------------------------------------#
 # filter for HKH countries -
