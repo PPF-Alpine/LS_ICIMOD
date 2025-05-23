@@ -1,14 +1,21 @@
+
 # Load configuration file
 source(here::here("R/00_Config_file.R"))
 
+#----------------------------------------------------------#
+# join red list assesments -----
+#----------------------------------------------------------#
 
 library(tidyverse)
 library(rgbif)
-
+library(taxize)
 
 RL_national <- read.csv(paste0(data_storage_path,"RL_assessments/national_assessment_webscraping_output.csv"))|>
   janitor::clean_names()
 
+#----------------------------------------------------------#
+# join red list assesments -----
+#----------------------------------------------------------#
 
 RL_national <- RL_national|>
   mutate(
@@ -36,16 +43,46 @@ RL_national <- RL_national|>
     )
   )
   
-
 #----------------------------------------------------------#
 # get the higher taxonomy for the species--
 #----------------------------------------------------------#
+
 # Extract the vector of scientific names
 scinames <- RL_national|>
+  distinct(sciname)|>
   pull(sciname)
 
-# fetch gbif taxonomy
-taxonomy_df <- map_dfr(scinames, get_gbif_taxonomy)
+# get classifications with taxize
+classifications <- classification(scinames, db = "itis")
+
+# flatten to df
+classification_df <- map_dfr(
+  names(classifications),
+  function(sciname) {
+    entry <- classifications[[sciname]]
+    if (is.data.frame(entry)) {
+      entry$sciname <- sciname  # add sciname name as a column
+      return(entry)
+    } else {
+      return(NULL)  
+    }
+  }
+)
+
+# pivot
+classification_df_wide <- classification_df %>%
+  select(sciname, rank, name) %>%
+  pivot_wider(names_from = rank, values_from = name)|>
+  select(sciname,kingdom,phylum,class,order,family,genus)
+
+# left join
+RL_national_join <- RL_national|>
+  left_join(classification_df_wide,by= c("sciname","genus"))
+
+# select relevant columns and bring in order
+RL_national_reshape <- RL_national_join|>
+  select(kingdom,
+         phylum,class,order,family,genus,species,sciname,species_or_taxon,common_names,year_assessed,countries_iso,locality,publication,criteria_system,status,status_code,status_summary,publication_citation)
 
 #----------------------------------------------------------#
 # filter for HKH countries -
@@ -61,6 +98,13 @@ HKH_countries <- c("Nepal",
                    "China")
 
 RL_national_filter <- RL_national |>
-  filter(str_detect(countries_iso, str_c(HKH_countries, collapse = "|")))
+  filter(str_detect(countries_iso, 
+                    str_c(HKH_countries, collapse = "|")))
 
+
+#----------------------------------------------------------#
+#   save
+#----------------------------------------------------------#
+
+write.csv(RL_national_reshape,paste0(data_storage_path,"RL_assessments/national_IUCN_RL_assessments_23052025.csv"))
 
