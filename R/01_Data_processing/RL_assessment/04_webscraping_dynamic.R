@@ -52,7 +52,7 @@ for (i in 0:(limit - 1)) {
 final_df <- bind_rows(all_tables)
 
 #----------------------------------------------------------#
-# Webscrape table from nationalredlist.org ---
+# save the data ---
 #----------------------------------------------------------#
 
 write.csv(final_df,paste0(data_storage_path,"RL_assessments/national_assessment_webscraping_output.csv"))
