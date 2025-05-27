@@ -7,14 +7,16 @@ source(here::here("R/00_Config_file.R"))
 
 library(tidyverse)
 library(ggplot2)
+library(patchwork)
 
 # load RL and HKH list
-full_assessment_hkh_mammals <- read.csv(paste0(data_storage_path,"RL_assessments/full_assessment_hkh_mammals_23052025.csv"))
+full_assessment_hkh_mammals <- read.csv(paste0(data_storage_path,"RL_assessments/full_assessment_hkh_mammals_27052025.csv"))
 
 full_ass_work_data <- full_assessment_hkh_mammals|>
   filter(str_squish(countries_iso) != "Nepal, India, Pakistan, Myanmar, Viet Nam, Thailand, Indonesia, Philippines (the), Singapore")|>
   select(sciname,status_code_national,status_summary_national,status_code_global,countries_iso)
 
+plot_output_path <- paste0(data_storage_path, "Visualizations/")
 #----------------------------------------------------------#
 # plot assesments numbers per category-----
 #----------------------------------------------------------#
@@ -49,12 +51,12 @@ agg_plot <- plot_data |>
   summarise(species_count = n_distinct(sciname), .groups = "drop")
 
 
-ggplot(agg_plot, aes(x = region, y = species_count, fill = status_code)) +
+plot1<-ggplot(agg_plot, aes(x = region, y = species_count, fill = status_code)) +
   geom_bar(stat = "identity") +
   scale_fill_viridis_d(option = "inferno", na.value = "lightgrey", direction = 1) +
   labs(
-    title = "Number of threathened mammals in HKH",
-    x = "Region",
+    title = NULL,
+    x = NULL,
     y = "Number of Species",
     fill = "Status Code"
   ) +
@@ -74,16 +76,39 @@ rel_plot <- plot_data |>
   ungroup()
 
 # Plot relative proportions
-ggplot(rel_plot, aes(x = region, y = prop, fill = status_code)) +
+plot2<-ggplot(rel_plot, aes(x = region, y = prop, fill = status_code)) +
   geom_bar(stat = "identity", position = "fill") +
   scale_fill_viridis_d(option = "inferno", na.value = "lightgrey", direction = 1) +
   scale_y_continuous(labels = scales::percent_format()) +
   labs(
-    title = "Proportion of threathened mammals in HKH per country",
-    x = "Region",
+    title = NULL,
+    x = NULL,
     y = "Percentage of Species",
     fill = "Status Code"
   ) +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
+
+# Save Plot 2
+ggsave(filename = paste0(plot_output_path, "rel_threathened_mammals.jpg"),
+       plot = plot2, width = 8, height = 6, dpi = 300)
+
+# Save Plot 2
+ggsave(filename = paste0(plot_output_path, "abs_threathened_mammals.jpg"),
+       plot = plot1, width = 8, height = 6, dpi = 300)
+
+
+
+
+# Combine plots with a shared legend and title alignment
+combined_plot <- plot1 + plot2 +
+  plot_layout(ncol = 2, guides = "collect") & 
+  theme(legend.position = "bottom")
+
+# Show the plot
+print(combined_plot)
+
+# Save the combined plot
+ggsave(filename = paste0(plot_output_path, "combined_threatened_mammals.jpg"),
+       plot = combined_plot, width = 12, height = 6, dpi = 300)

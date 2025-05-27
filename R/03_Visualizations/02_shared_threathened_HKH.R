@@ -5,6 +5,8 @@ library(circlize)
 library(igraph)
 library(ggraph)
 library(ggplot2)
+library(ggalluvial)
+
 
 #----------------------------------------------------------#
 # join red list assesments -----
@@ -51,7 +53,7 @@ ggplot(pairwise_symmetric, aes(x = country1, y = country2, fill = shared_count))
   geom_tile(color = "white") +
   scale_fill_viridis_c(option = "inferno", na.value = "white",direction=-1) +
   labs(
-    title = "shared threatened and data deficient mammals across countries",
+    title = "Shared threatened and data deficient mammals across countries",
     x = NULL,
     y = NULL,
     fill = "Shared Species"
@@ -73,8 +75,14 @@ colors <- c(Pakistan = "lightgrey",
             Nepal = "#F7C530",
             Bhutan = "#95CC5E")
 
-chordDiagram(pairwise_symmetric,grid.col = colors,annotationTrack = c("name", "grid"))  
+plo1<- chordDiagram(pairwise_symmetric,grid.col = colors,annotationTrack = c("name", "grid"))  
 
+jpeg(filename = paste0(plot_output_path, "shared_threatened_HKH_mammals.jpg"),
+     width = 8, height = 6, units = "in", res = 300)
+
+chordDiagram(pairwise_symmetric, grid.col = colors, annotationTrack = c("name", "grid"))
+
+dev.off()
 #----------------------------------------------------------#
 # network graph-----
 #----------------------------------------------------------#
@@ -89,3 +97,41 @@ ggraph(g, layout = "fr") +
   scale_edge_width_continuous(range = c(0.5, 3)) +
   theme_void() +
   labs(title = "Shared Threatened Mammals Between Countries")
+
+#----------------------------------------------------------#
+# network graph-----
+#----------------------------------------------------------#
+
+library(ggalluvial)
+library(tidyverse)
+library(ggalluvial)
+library(tidyverse)
+
+# Reorder countries for better visual flow (optional)
+pairwise_symmetric <- pairwise_symmetric %>%
+  mutate(
+    country1 = factor(country1, levels = sort(unique(c(country1, country2)))),
+    country2 = factor(country2, levels = sort(unique(c(country1, country2))))
+  )
+
+# Create the plot
+ggplot(pairwise_symmetric,
+       aes(axis1 = country1, axis2 = country2, y = shared_count)) +
+  geom_alluvium(aes(fill = country1), width = 1/10, alpha = 0.6) +  # reduced alpha
+  geom_stratum(width = 1/5, fill = "gray95", color = "black") +
+  geom_text(
+    stat = "stratum",
+    aes(label = after_stat(stratum)),
+    size = 4.5, color = "black", fontface = "bold", vjust = 0.5
+  ) +
+  geom_text(
+    aes(label = shared_count), stat = "alluvium",
+    size = 3.5, color = "black", nudge_x = 0.3, check_overlap = TRUE
+  ) +
+  scale_fill_viridis_d() +
+  scale_x_discrete(limits = c("Country 1", "Country 2"), expand = c(0.1, 0.05)) +
+  theme_void(base_size = 13) +
+  theme(
+    legend.position = "none"
+  )
+

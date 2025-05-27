@@ -28,6 +28,8 @@ source(here::here("R/00_Config_file.R"))
 HKH_mammals <- readxl::read_xlsx(paste0(data_storage_path,"HKH_list/HKH_mammals_LS_cleaned.xlsx"))|>
   janitor::clean_names()
 
+length(unique(HKH_mammals$sciname))
+HKH_mammals_unique <- HKH_mammals[duplicated(HKH_mammals$sciname), ]
 
 # Assuming your data frame is named df
 HKH_mammals_restr <- HKH_mammals %>%
@@ -66,5 +68,5 @@ HKH_mammals_restr <- HKH_mammals %>%
 # fetch gbif taxonomy
 #taxonomy_df <- map_dfr(scinames, get_gbif_taxonomy)
 
-write.csv(HKH_mammals_restr,paste0(data_storage_path,"HKH_list/HKH_mammals_LS_23052025.csv"))
+write.csv(HKH_mammals_restr,paste0(data_storage_path,"HKH_list/HKH_mammals_LS_27052025.csv"))
 

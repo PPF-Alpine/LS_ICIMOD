@@ -11,11 +11,11 @@ library(ggplot2)
 # load RL and HKH list
 HKH_RL <- read.csv(paste0(data_storage_path,"RL_assessments/HKH_RL_assessments_23052025.csv"))
 
-HKH_list <- read.csv(paste0(data_storage_path,"HKH_list/HKH_mammals_LS_23052025.csv"))|>
+HKH_list <- read.csv(paste0(data_storage_path,"HKH_list/HKH_mammals_LS_27052025.csv"))|>
   select(-X)|>
   rename(habitat_HMW = habitat)
 
-global_RL <- read.csv(paste0(data_storage_path,"RL_assessments/global_assessment_HKH_mammals_full.csv"))
+global_RL <- read.csv(paste0(data_storage_path,"RL_assessments/global_assessment_HKH_mammals_full_26052025.csv"))
 
 length(unique(global_RL_select$sciname))
 #----------------------------------------------------------#
@@ -57,17 +57,29 @@ full_assessment_hkh_mammals <- HKH_list|>
   full_join(HKH_RL_select,by="sciname")|>
   left_join(global_RL_select,by="sciname")
 
-nas <- full_assessment_hkh_mammals|>
-  filter(is.na(family))
+#nas_nepal <- full_assessment_hkh_mammals|>
+ # filter((is.na(family) & countries_iso == "Nepal"))|>
+  #select(sciname,order,family,min_elevation_himalaya,max_elevation_himalaya)
 
 full_assessment_hkh_mammals <- full_assessment_hkh_mammals|>
-filter(!(is.na(family) & countries_iso != "Nepal"))
+filter(!(is.na(family) & countries_iso != "Nepal"))|>
+  mutate(
+    status_summary_global = case_when( # add a summary column for IUCN status
+      status_code_global %in% c("CR", "EN", "VU", "NT", "LE", "RE") ~ "threatened",
+      status_code_global == "NE" ~ "not evaluated",
+      status_code_global == "LC" ~ "not threatened",
+      status_code_global == "DD" ~ "data deficient",
+      TRUE ~ "NA"  
+    )
+  )
 
 #----------------------------------------------------------#
 #   save
 #----------------------------------------------------------#
 
-write.csv(full_assessment_hkh_mammals,paste0(data_storage_path,"RL_assessments/full_assessment_hkh_mammals_23052025.csv"))
+write.csv(full_assessment_hkh_mammals,paste0(data_storage_path,"RL_assessments/full_assessment_hkh_mammals_27052025.csv"))
 
+
+write.csv(nas_nepal,paste0(data_storage_path,"RL_assessments/nas_nepal.csv"))
 
 
