@@ -67,7 +67,6 @@ ggplot(pairwise_symmetric, aes(x = country1, y = country2, fill = shared_count))
 
 # Needs a symmetric matrix
 
-
 colors <- c(Pakistan = "lightgrey",
             China = "purple", 
             India = "#FF410D",
@@ -75,7 +74,8 @@ colors <- c(Pakistan = "lightgrey",
             Nepal = "#F7C530",
             Bhutan = "#95CC5E")
 
-plo1<- chordDiagram(pairwise_symmetric,grid.col = colors,annotationTrack = c("name", "grid"))  
+plo1<- chordDiagram(pairwise_symmetric,grid.col = colors,annotationTrack = c("name", "grid"),
+                    transparency = 0.6,direction.type = "diffHeight",)  
 
 jpeg(filename = paste0(plot_output_path, "shared_threatened_HKH_mammals.jpg"),
      width = 8, height = 6, units = "in", res = 300)
