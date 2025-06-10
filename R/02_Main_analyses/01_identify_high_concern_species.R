@@ -10,7 +10,7 @@ library(ggplot2)
 unique(full_assessment_hkh_mammals$countries_iso)
 
 # load RL and HKH list
-full_assessment_hkh_mammals <- read.csv(paste0(data_storage_path,"RL_assessments/full_assessment_hkh_mammals_27052025.csv"))|>
+full_assessment_hkh_mammals <- read.csv(paste0(data_storage_path,"RL_assessments/assessment_hkh_mammals_10062025_LS.csv"))|>
   filter(
   str_squish(countries_iso) != "Nepal, India, Pakistan, Myanmar, Viet Nam, Thailand, Indonesia, Philippines (the), Singapore"
 )
@@ -26,7 +26,7 @@ full_assessment_hkh_mammals |>
   ) |>
   distinct(sciname)|>
   count()
-#263
+#280
 
 # how many species are threatened in more than one country
 full_assessment_hkh_mammals |>
@@ -35,7 +35,7 @@ full_assessment_hkh_mammals |>
   filter(n_distinct(countries_iso) > 1) |>
   summarise() |>
   nrow()
-
+#103
 
 # number of threatened species
 # number for each status code national for each country
@@ -54,7 +54,7 @@ threat_status_by_country <- full_assessment_hkh_mammals |>
 
 
 #----------------------------------------------------------#
-# high concern species -----
+# high concern species that are listed across several countries and have decreasing pop trend -----
 #----------------------------------------------------------#
 # identify which species are:
 # threathened across more than one country (status code national summary  == threathened)
@@ -93,14 +93,12 @@ result <- full_assessment_hkh_mammals |>
 
 length(unique(result$sciname))
 
-# 41 species are listed as threathened across several countries and also globally and there population trend global is decreasing
-
-
+# 40 species are listed as threathened across several countries and also globally and there population trend global is decreasing
 
 species_summary <- result |>
   group_by(sciname) |>
   summarise(
-    common_name = str_trim(str_split(common_name[1], ";")[[1]][1]),
+    common_name = str_trim(str_split(common_names_iucn[1], ";")[[1]][1]),
     countries_threatened = paste(unique(countries_iso), collapse = "; "),
     status_code_national = paste(status_code_national, collapse = "; "),
     year_assessed_national = paste(year_assessed_national, collapse = "; "),
@@ -109,5 +107,33 @@ species_summary <- result |>
     year_assessed_global = first(year_assessed_global),
   )
 
-write.csv(species_summary,paste0(data_storage_path,"RL_assessments/high_concern_species.csv"))
+write.csv(species_summary,paste0(data_storage_path,"RL_assessments/high_concern_species_nrl_poptrend.csv"))
 
+#----------------------------------------------------------#
+  # high concern species that are listed across several countries 
+#----------------------------------------------------------#
+
+result_multi_country<-full_assessment_hkh_mammals |>
+  filter(status_summary_national == "threatened") |>
+  group_by(sciname) |>
+  filter(n_distinct(countries_iso) > 1) 
+
+
+# Summarise into same format
+species_summary_multi_country <- result_multi_country |>
+  group_by(sciname) |>
+  summarise(
+    common_name = str_trim(str_split(common_names_iucn[1], ";")[[1]][1]),
+    countries_threatened = paste(unique(countries_iso), collapse = "; "),
+    status_code_national = paste(status_code_national, collapse = "; "),
+    year_assessed_national = paste(year_assessed_national, collapse = "; "),
+    wildlife_protection_india_2022 = first(wildlife_protection_india_2022),
+    status_code_global = first(status_code_global),
+    pop_trend_global = first(pop_trend_global),
+    year_assessed_global = first(year_assessed_global),
+    .groups = "drop"
+  )|>
+  rename(wildlife_protection_india=wildlife_protection_india_2022)
+
+# Export
+write.csv(species_summary_multi_country, paste0(data_storage_path, "RL_assessments/multi_country_threatened_species.csv"))

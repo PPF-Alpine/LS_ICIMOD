@@ -13,7 +13,7 @@ library(ggalluvial)
 #----------------------------------------------------------#
 
 # load RL and HKH list
-full_assessment_hkh_mammals <- read.csv(paste0(data_storage_path,"RL_assessments/full_assessment_hkh_mammals_23052025.csv"))
+full_assessment_hkh_mammals <- read.csv(paste0(data_storage_path,"RL_assessments/full_assessment_hkh_mammals_08062025.csv"))
 
 full_ass_work_data <- full_assessment_hkh_mammals|>
   filter(str_squish(countries_iso) != "Nepal, India, Pakistan, Myanmar, Viet Nam, Thailand, Indonesia, Philippines (the), Singapore")|>
@@ -99,13 +99,9 @@ ggraph(g, layout = "fr") +
   labs(title = "Shared Threatened Mammals Between Countries")
 
 #----------------------------------------------------------#
-# network graph-----
+# ggaluvial :: sankey -----
 #----------------------------------------------------------#
 
-library(ggalluvial)
-library(tidyverse)
-library(ggalluvial)
-library(tidyverse)
 
 # Reorder countries for better visual flow (optional)
 pairwise_symmetric <- pairwise_symmetric %>%
@@ -114,24 +110,28 @@ pairwise_symmetric <- pairwise_symmetric %>%
     country2 = factor(country2, levels = sort(unique(c(country1, country2))))
   )
 
-# Create the plot
-ggplot(pairwise_symmetric,
-       aes(axis1 = country1, axis2 = country2, y = shared_count)) +
-  geom_alluvium(aes(fill = country1), width = 1/10, alpha = 0.6) +  # reduced alpha
+
+# Create the plot and assign it to a variable
+alluvial_plot <- ggplot(pairwise_symmetric,
+                        aes(axis1 = country1, axis2 = country2, y = shared_count)) +
+  geom_alluvium(aes(fill = country1), width = 1/10, alpha = 0.7) +
   geom_stratum(width = 1/5, fill = "gray95", color = "black") +
-  geom_text(
-    stat = "stratum",
-    aes(label = after_stat(stratum)),
-    size = 4.5, color = "black", fontface = "bold", vjust = 0.5
-  ) +
-  geom_text(
-    aes(label = shared_count), stat = "alluvium",
-    size = 3.5, color = "black", nudge_x = 0.3, check_overlap = TRUE
-  ) +
-  scale_fill_viridis_d() +
+  geom_text(stat = "stratum", aes(label = after_stat(stratum)),
+            size = 4.5, color = "black", fontface = "bold", vjust = 0.5) +
+  geom_text(aes(label = shared_count), stat = "alluvium",
+            size = 3.5, color = "black", nudge_x = 0.3, check_overlap = TRUE) +
+  scale_fill_viridis_d(option = "C") +
   scale_x_discrete(limits = c("Country 1", "Country 2"), expand = c(0.1, 0.05)) +
   theme_void(base_size = 13) +
-  theme(
-    legend.position = "none"
-  )
+  theme(legend.position = "none")
+
+
+plot(alluvial_plot)
+plot_output_path <- "C:/Users/lotta/OneDrive - University of Bergen/Desktop/ICIMOD_work/Visualizations/shared_species_alluvial.png"
+
+ggsave(plot_output_path, plot = alluvial_plot, width = 10, height = 12, dpi = 300)
+
+
+# Save the plot
+ggsave(plot_output_path, plot = alluvial_plot, width = 10, height = 12, dpi = 300)
 

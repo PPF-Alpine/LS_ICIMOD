@@ -11,7 +11,7 @@ library(ggplot2)
 #----------------------------------------------------------#
 
 # load RL and HKH list
-full_assessment_hkh_mammals <- read.csv(paste0(data_storage_path,"RL_assessments/full_assessment_hkh_mammals_23052025.csv"))
+full_assessment_hkh_mammals <- read.csv(paste0(data_storage_path,"RL_assessments/full_assessment_hkh_mammals_08062025.csv"))
 
 length(unique(full_assessment_hkh_mammals$sciname))
 
@@ -37,18 +37,20 @@ plot_output_path <- paste0(data_storage_path, "Visualizations/")
 # Plot 1: Elevational ranges
 plot1 <- ggplot(df_long_jittered) +
   geom_linerange(aes(x = jittered_mid, ymin = min, ymax = max),
-                 alpha = 0.8, linewidth = 0.3, color = "darkgrey") +
+                 alpha = 0.9, linewidth = 0.2, color = "grey60") +
   geom_point(aes(x = jittered_mid, y = jittered_mid),
-             size = 0.7, alpha = 0.9, color = "darkgrey") +
+             size = 0.7, alpha = 0.9, color = "grey40") +
   scale_y_continuous(name = "Elevation range (m)") +
   scale_x_continuous(name = "Midpoint elevation (m)") +
   theme_minimal(base_size = 13) +
-  theme(strip.text = element_text(face = "bold", size = 12)) 
+  theme(strip.text = element_text(face = "bold", size = 12),
+        panel.grid = element_blank()) 
 
 
+plot(plot1)
 # Save Plot 1
 ggsave(filename = paste0(plot_output_path, "elevational_ranges_HKH_mammals.jpg"),
-       plot = plot1, width = 8, height = 6, dpi = 300)
+       plot = plot1, width = 9, height = 5, dpi = 300)
 
 # Plot 2: Midpoint elevations
 plot2 <- ggplot(df_long, aes(x = range, y = mid_elevation)) +

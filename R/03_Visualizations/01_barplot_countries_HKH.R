@@ -10,7 +10,7 @@ library(ggplot2)
 library(patchwork)
 
 # load RL and HKH list
-full_assessment_hkh_mammals <- read.csv(paste0(data_storage_path,"RL_assessments/full_assessment_hkh_mammals_27052025.csv"))
+full_assessment_hkh_mammals <- read.csv(paste0(data_storage_path,"RL_assessments/full_assessment_hkh_mammals_02062025.csv"))
 
 full_ass_work_data <- full_assessment_hkh_mammals|>
   filter(str_squish(countries_iso) != "Nepal, India, Pakistan, Myanmar, Viet Nam, Thailand, Indonesia, Philippines (the), Singapore")|>
@@ -63,6 +63,9 @@ plot1<-ggplot(agg_plot, aes(x = region, y = species_count, fill = status_code)) 
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
+plot(plot1)
+
+length(unique(plot_data$sciname))
 
 #----------------------------------------------------------#
 # plot assesments relative categories -----

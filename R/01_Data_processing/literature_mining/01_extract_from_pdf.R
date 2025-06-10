@@ -73,6 +73,21 @@ parsed <- tibble(raw = joined_lines) %>%
 parsed$number <- as.numeric(parsed$number)
 
 
+final_table <- parsed|>
+  mutate(sciname = paste(genus, species, sep = " "))|>
+  select(-number)
+  
+
+#----------------------------------------------------------#
+#   save
+#----------------------------------------------------------#
+
+write.csv(final_table,paste0(data_storage_path,"RL_assessments/national/pakistan_national_rl.csv"))
+
+  
+  
+  
+
 
 
 
