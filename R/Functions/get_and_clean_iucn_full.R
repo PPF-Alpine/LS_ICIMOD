@@ -18,7 +18,11 @@ flatten_assessment_full <- function(assessment, genus, species) {
       range = NA,
       habitats_iucn = NA,
       threats_summary = NA,
-      country_code_global = NA
+      country_code_global = NA,
+      ecosystem_description_iucn = NA,
+      ecosystem_code_iucn = NA,
+      conservation_action_code_iucn = NA,
+      conservation_action_description_iucn = NA
     ))
   }
   
@@ -51,16 +55,22 @@ flatten_assessment_full <- function(assessment, genus, species) {
         NA
       }
     },
-    
     order_name = safe_extract(assessment, "taxon", "order_name"),
     family_name = safe_extract(assessment, "taxon", "family_name"),
     pop_trend_global = safe_extract(assessment, "population_trend", "description", "en"),
     range = safe_extract(assessment, "documentation", "range"),
     habitats_iucn = paste(get_or_na(safe_extract(assessment, "documentation", "habitats")), collapse = "; "),
     threats_summary = paste(get_or_na(safe_extract(assessment, "documentation", "threats")), collapse = "; "),
-    country_code_global = paste(get_or_na(safe_extract(assessment, "locations", "code")), collapse = "; ")
+    country_code_global = paste(get_or_na(safe_extract(assessment, "locations", "code")), collapse = "; "),
+    
+    # 🔽 New IUCN fields below
+    ecosystem_description_iucn = paste(get_or_na(safe_extract(assessment, "habitats", "description")), collapse = "; "),
+    ecosystem_code_iucn = paste(get_or_na(safe_extract(assessment, "habitats", "code")), collapse = "; "),
+    conservation_action_code_iucn = paste(get_or_na(safe_extract(assessment, "conservation_actions", "code")), collapse = "; "),
+    conservation_action_description_iucn = paste(get_or_na(safe_extract(assessment, "conservation_actions", "description")), collapse = "; ")
   )
 }
+
 
 
 get_and_clean_iucn_full <- function(genus, species) {

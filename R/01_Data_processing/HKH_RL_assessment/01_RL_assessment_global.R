@@ -13,8 +13,7 @@ library(here)
 library(rredlist)
 library(rlist)
 library(purrr)
-# Load configuration file
-source(here::here("R/00_Config_file.R"))
+
 
 iucn_key <-"6U8o8k6YEKh8TaGDeNonEezQQyu9vMYLUCyd"
 
@@ -23,7 +22,7 @@ iucn_key <-"6U8o8k6YEKh8TaGDeNonEezQQyu9vMYLUCyd"
 #----------------------------------------------------------#
 
 # load RL and HKH list
-df <- read.csv(paste0(data_storage_path,"RL_assessments/full_assessment_hkh_mammals_23052025.csv"))
+df <- read.csv(paste0(data_storage_path,"RL_assessments/assessment_hkh_mammals_10062025_LS.csv"))
 
 
 df <- readxl::read_xlsx(paste0(data_storage_path,"HKH_list/HKH_mammals_LS_cleaned.xlsx"))|>
@@ -57,4 +56,4 @@ assessment_threats_complete <- pmap_dfr(spp[, c("genus", "species")], get_and_cl
 #   save
 #----------------------------------------------------------#
 
-write.csv(assessment_threats_complete,paste0(data_storage_path,"RL_assessments/global_assessment_HKH_mammals_full_26052025.csv"))
+write.csv(assessment_threats_complete,paste0(data_storage_path,"RL_assessments/global_assessment_HKH_mammals_full_25062025.csv"))

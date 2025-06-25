@@ -127,5 +127,22 @@ assessment_updated<- assessment_updated|>
 
 write.csv(assessment_updated,paste0(data_storage_path,"RL_assessments/assessment_hkh_mammals_10062025_LS.csv"))
 
+#----------------------------------------------------------#
+#   additionally --> update with additional info from global RL
+#----------------------------------------------------------#
+
+# load RL and HKH list
+assessment_updated_x <- read.csv(paste0(data_storage_path,"RL_assessments/assessment_hkh_mammals_10062025_LS.csv"))
+
+# load RL and HKH list
+global_rl <- read.csv(paste0(data_storage_path,"RL_assessments/global_assessment_HKH_mammals_full_25062025.csv"))
+
+selected_info <- global_rl|>
+  select(sciname,conservation_action_code_iucn,conservation_action_description_iucn,ecosystem_description_iucn,ecosystem_code_iucn)
 
 
+assessment_updated_x <- assessment_updated_x|>
+  right_join(selected_info,by="sciname")|>
+  select(sciname,order,family,common_names_iucn,status_code_national,status_summary_national,countries_iso,year_assessed_national,publication_national,publication_citation_national,wildlife_protection_india_2022,status_code_global,status_summary_global,year_assessed_global,iucn_criteria_global,citation_iucn_global,threats_code,threats_description,threats_global,stresses_code,stresses_description,conservation_action_code_iucn,conservation_action_description_iucn,pop_trend_global,range_global,country_code_global,habitats_iucn,habitat_HMW,,ecosystem_description_iucn,ecosystem_code_iucn,GMBA_mountain_range,average_min_elevation,average_max_elevation,min_elevation_himalaya,max_elevation_himalaya,min_elevation_tibetan_plateau,max_elevation_tibetan_plateau,min_elevation_balochistan_ranges,max_elevation_balochistan_ranges,min_elevation_hindu_kush,max_elevation_hindu_kush,min_elevation_karakoram,max_elevation_karakoram)
+
+write.csv(assessment_updated_x,paste0(data_storage_path,"RL_assessments/assessment_hkh_mammals_25062025_LS.csv"))
