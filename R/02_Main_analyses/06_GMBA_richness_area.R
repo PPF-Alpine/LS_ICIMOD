@@ -16,6 +16,8 @@ library(RColorBrewer)
 # load RL and HKH list
 full_assessment_hkh_mammals <- read.csv(paste0(data_storage_path,"RL_assessments/full_assessment_hkh_mammals_08062025.csv"))
 
+hkh_boundaries <- sf::st_read(paste(data_storage_path,"HKH_Boundary/HKH_Boundary.shp", sep = "/"))
+
 
 # read shps
 hkh_gmba <- sf::st_read(paste(data_storage_path,"HKH_Boundary/HKH_GMBA_clip.shp", sep = "/"))
@@ -68,6 +70,24 @@ mountain_labels <- hkh_gmba_subset_join %>%
          y = st_coordinates(label_point)[,2])
 
 
+
+# Override specific label positions
+mountain_labels <- mountain_labels %>%
+  mutate(
+    x = case_when(
+      MapName == "Balochistan Ranges" ~ 66,  # <- Adjust as needed
+      MapName == "Himalaya" ~ 83.0,           # <- Adjust as needed
+      TRUE ~ x
+    ),
+    y = case_when(
+      MapName == "Balochistan Ranges" ~ 25,  # <- Adjust as needed
+      MapName == "Himalaya" ~ 26.3,           # <- Adjust as needed
+      MapName == "Hindu Kush"~38.5,
+      MapName == "Karakoram" ~ 37,
+      TRUE ~ y
+    )
+  )
+
 # Load world map and filter for Asia
 world <- ne_countries(scale = "medium", returnclass = "sf")
 asia <- world %>% filter(region_un == "Asia")
@@ -83,9 +103,9 @@ species_map <- ggplot() +
   geom_text(
     data = mountain_labels,
     aes(x = x, y = y, label = MapName),
-    size = 6,              # Controls text size (try 4–6 for maps)
+    size = 4,              # Controls text size (try 4–6 for maps)
     color = "black",
-    fontface = "bold"      # Use "italic", "bold", etc.
+    fontface = "italic"      # Use "italic", "bold", etc.
   )+
   scale_fill_viridis_c(option = "inferno", name = "Mammal richness per 1000km2", direction = -1) +
   coord_sf(xlim = c(hkh_bbox["xmin"], hkh_bbox["xmax"]),
@@ -98,7 +118,7 @@ species_map <- ggplot() +
     axis.title.x = element_blank(),
     axis.title.y = element_blank(),
     legend.title = element_text(face = "bold"),
-    plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
+    plot.title = element_text(hjust = 0.5, size = 14, face = "italic"),
     plot.subtitle = element_text(hjust = 0.5, size = 12)
   )
 

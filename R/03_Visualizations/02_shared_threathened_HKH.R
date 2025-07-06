@@ -13,7 +13,7 @@ library(ggalluvial)
 #----------------------------------------------------------#
 
 # load RL and HKH list
-full_assessment_hkh_mammals <- read.csv(paste0(data_storage_path,"RL_assessments/full_assessment_hkh_mammals_08062025.csv"))
+full_assessment_hkh_mammals <- read.csv(paste0(data_storage_path,"RL_assessments/assessment_hkh_mammals_25062025_LS.csv"))
 
 full_ass_work_data <- full_assessment_hkh_mammals|>
   filter(str_squish(countries_iso) != "Nepal, India, Pakistan, Myanmar, Viet Nam, Thailand, Indonesia, Philippines (the), Singapore")|>
@@ -75,14 +75,22 @@ colors <- c(Pakistan = "lightgrey",
             Bhutan = "#95CC5E")
 
 plo1<- chordDiagram(pairwise_symmetric,grid.col = colors,annotationTrack = c("name", "grid"),
-                    transparency = 0.6,direction.type = "diffHeight",)  
+                    transparency = 0,direction.type = "diffHeight",)  
 
-jpeg(filename = paste0(plot_output_path, "shared_threatened_HKH_mammals.jpg"),
-     width = 8, height = 6, units = "in", res = 300)
+# Open SVG device first
+svg(filename = paste0(plot_output_path, "shared_threatened_HKH_mammals.svg"),
+    width = 8, height = 6)
 
-chordDiagram(pairwise_symmetric, grid.col = colors, annotationTrack = c("name", "grid"))
+# Generate chord diagram
+chordDiagram(pairwise_symmetric,
+             grid.col = colors,
+             annotationTrack = c("name", "grid"),
+             transparency = 0,
+             direction.type = "diffHeight")
 
+# Close device
 dev.off()
+
 #----------------------------------------------------------#
 # network graph-----
 #----------------------------------------------------------#

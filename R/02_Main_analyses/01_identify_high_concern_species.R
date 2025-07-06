@@ -10,7 +10,7 @@ library(ggplot2)
 unique(full_assessment_hkh_mammals$countries_iso)
 
 # load RL and HKH list
-full_assessment_hkh_mammals <- read.csv(paste0(data_storage_path,"RL_assessments/assessment_hkh_mammals_10062025_LS.csv"))|>
+full_assessment_hkh_mammals <- read.csv(paste0(data_storage_path,"RL_assessments/assessment_hkh_mammals_25062025_LS.csv"))|>
   filter(
   str_squish(countries_iso) != "Nepal, India, Pakistan, Myanmar, Viet Nam, Thailand, Indonesia, Philippines (the), Singapore"
 )
@@ -22,20 +22,20 @@ full_assessment_hkh_mammals <- read.csv(paste0(data_storage_path,"RL_assessments
 # how many species are threathened
 full_assessment_hkh_mammals |>
   filter(
-    status_summary_national == "threatened"
+    status_summary_national == "threatened"|status_summary_national =="data deficient"
   ) |>
   distinct(sciname)|>
   count()
-#280
+#346
 
 # how many species are threatened in more than one country
 full_assessment_hkh_mammals |>
-  filter(status_summary_national == "threatened") |>
+  filter(status_summary_national == "threatened"|status_summary_national =="data deficient") |>
   group_by(sciname) |>
   filter(n_distinct(countries_iso) > 1) |>
   summarise() |>
   nrow()
-#103
+#161
 
 # number of threatened species
 # number for each status code national for each country
@@ -51,8 +51,23 @@ threat_status_by_country <- full_assessment_hkh_mammals |>
   group_by(countries_iso, status_code_national) |>
   summarise(n_species = n_distinct(sciname), .groups = "drop")
 
+# threat by order 
+order_threat<-full_assessment_hkh_mammals |>
+  filter(
+    status_summary_national == "threatened"|status_summary_national =="data deficient"
+  ) |>
+  group_by(order,status_code_national)|>
+  count()
 
+# threat by order 
+order_threat<-full_assessment_hkh_mammals |>
+  filter(
+    status_summary_national == "threatened"|status_summary_national =="data deficient"
+  ) |>
+  group_by(order)|>
+  count()
 
+# across ecosystems 
 #----------------------------------------------------------#
 # high concern species that are listed across several countries and have decreasing pop trend -----
 #----------------------------------------------------------#
